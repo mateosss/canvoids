@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvoids</title>
+</head>
+<style>
+  canvas {
+    border: 2px solid black;
+  }
+</style>
+
+<body>
+  <canvas id="canvas" width="256" height="256"></canvas>
+</body>
+<script>
+  "use strict"
+  function main() {
+    let canvas = document.querySelector("#canvas")
+    let c = canvas.getContext("2d")
+
+    c.fillStyle = "rgb(200, 0, 0)"
+    c.fillRect(16, 16, 48, 48)
+    c.fillStyle = "rgb(0, 0, 200, 0.5)"
+    c.fillRect(32, 32, 48, 48)
+
+    c.strokeRect(64, 64, 64, 64)
+
+    c.fillStyle = "rgb(220,150,180)"
+    c.beginPath()
+    c.moveTo(128, 128 + 16)
+    c.lineTo(128 - 16, 128 - 16)
+    c.lineTo(128 + 16, 128 - 16)
+    c.fill()
+
+    c.beginPath()
+    c.arc(196, 128, 32, 0, 2 * Math.PI)
+    c.moveTo(196 + 40, 196)
+    c.arc(196, 196, 40, 0, 2 * Math.PI)
+    c.stroke()
+  }
+  window.onload = main;
+</script>
+
+</html>
