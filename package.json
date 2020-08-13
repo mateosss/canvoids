@@ -1,0 +1,29 @@
+{
+  "name": "canvoids",
+  "version": "1.0.0",
+  "description": "Playing with canvas and boids",
+  "main": "main.js",
+  "scripts": {
+    "start": "./node_modules/live-server/live-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mateosss/canvoids.git"
+  },
+  "keywords": [
+    "canvas",
+    "boids",
+    "visuals"
+  ],
+  "author": "Mateo de Mayo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mateosss/canvoids/issues"
+  },
+  "homepage": "https://github.com/mateosss/canvoids#readme",
+  "devDependencies": {
+    "live-server": "^1.2.1",
+    "prettier": "^2.0.5"
+  }
+}
