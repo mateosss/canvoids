@@ -51,7 +51,9 @@
       "prettier"
     ],
     "rules": {
-      "prettier/prettier": "error"
+      "prettier/prettier": "error",
+      "no-restricted-syntax": "off",
+      "no-plusplus": "off"
     }
   }
 }
