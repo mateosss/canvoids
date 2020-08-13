@@ -1,7 +1,6 @@
-"use strict"
 function update() {
-  let canvas = document.querySelector("#canvas")
-  let c = canvas.getContext("2d")
+  const canvas = document.querySelector("#canvas")
+  const c = canvas.getContext("2d")
 
   c.save()
 
@@ -9,9 +8,9 @@ function update() {
   c.fillStyle = "white"
   c.fillRect(0, 0, 256, 256)
 
-  let time = Math.sin(new Date().getTime() * 0.001)
+  const time = Math.sin(new Date().getTime() * 0.001)
   c.translate(32 + time * 32, time)
-  c.rotate(Math.PI * 2 / 60 * time * 5)
+  c.rotate(((Math.PI * 2) / 60) * time * 5)
   c.scale(0.75 + 0.25 * time, 0.75 + 0.25 * time)
 
   // Main Draw
@@ -37,4 +36,5 @@ function update() {
 
   c.restore()
 }
-window.onload = () => setInterval(update, 1000 / 60);
+
+window.onload = () => setInterval(update, 1000 / 60)

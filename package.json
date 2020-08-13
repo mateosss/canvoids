@@ -23,7 +23,15 @@
   },
   "homepage": "https://github.com/mateosss/canvoids#readme",
   "devDependencies": {
-    "live-server": "^1.2.1",
-    "prettier": "^2.0.5"
+    "eslint": "7.6.0",
+    "eslint-config-airbnb-base": "14.2.0",
+    "eslint-config-prettier": "6.11.0",
+    "eslint-plugin-import": "2.22.0",
+    "eslint-plugin-prettier": "3.1.4",
+    "live-server": "1.2.1",
+    "prettier": "2.0.5"
+  },
+  "prettier": {
+    "semi": false
   }
 }
