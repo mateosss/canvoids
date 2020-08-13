@@ -4,21 +4,25 @@ class Actor {
     this.context = context
     this.x = x
     this.y = y
+    this.velx = 10
+    this.vely = 2
   }
 
   update() {
-    // TODO: clean previous render
-    // TODO: update position
-    this.x += 1
-    this.y += 1
+    // TODO: Do not hardcode 256 as canvas width/height
+    if ((this.x <= 0 && this.velx < 0) || (this.x >= 256 && this.velx > 0))
+      this.velx *= -1
+    if ((this.y <= 0 && this.vely < 0) || (this.y >= 256 && this.vely > 0))
+      this.vely *= -1
+    this.x += this.velx
+    this.y += this.vely
   }
 
   render() {
-    // TODO: render based on canvas context and actor state
     const c = this.context
     c.save()
     c.translate(this.x, this.y)
-    c.fillStyle = "black"
+    c.fillStyle = "white"
     c.fillRect(0, 0, 16, 16)
     c.restore()
   }
@@ -31,7 +35,11 @@ class Game {
     this.context = this.canvas.getContext("2d")
     // Initialize actors
     for (let i = 0; i < 8; i++) {
-      const actor = new Actor(this.context, 32, 1 + i * 32)
+      const actor = new Actor(
+        this.context,
+        Math.floor(Math.random() * 256),
+        1 + i * 32
+      )
       this.actors.push(actor)
     }
   }
@@ -42,51 +50,16 @@ class Game {
   }
 
   update() {
+    // Clean canvas
+    const c = this.context
+    c.fillStyle = "black"
+    c.fillRect(0, 0, this.canvas.width, this.canvas.height)
+
     for (const actor of this.actors) {
       actor.update()
       actor.render()
     }
   }
-  /*
-  update() {
-    const canvas = document.querySelector("#canvas")
-    const c = canvas.getContext("2d")
-
-    c.save()
-
-    // Clear
-    c.fillStyle = "white"
-    c.fillRect(0, 0, 256, 256)
-
-    const time = Math.sin(new Date().getTime() * 0.001)
-    c.translate(32 + time * 32, time)
-    c.rotate(((Math.PI * 2) / 60) * time * 5)
-    c.scale(0.75 + 0.25 * time, 0.75 + 0.25 * time)
-
-    // Main Draw
-    c.fillStyle = "rgb(200, 0, 0)"
-    c.fillRect(16, 16, 48, 48)
-    c.fillStyle = "rgb(0, 0, 200, 0.5)"
-    c.fillRect(32, 32, 48, 48)
-
-    c.strokeRect(64, 64, 64, 64)
-
-    c.fillStyle = "rgb(220,150,180)"
-    c.beginPath()
-    c.moveTo(128, 128 + 16)
-    c.lineTo(128 - 16, 128 - 16)
-    c.lineTo(128 + 16, 128 - 16)
-    c.fill()
-
-    c.beginPath()
-    c.arc(196, 128, 32, 0, 2 * Math.PI)
-    c.moveTo(196 + 40, 196)
-    c.arc(196, 196, 40, 0, 2 * Math.PI)
-    c.stroke()
-
-    c.restore()
-  }
-  */
 }
 
 const game = new Game()
