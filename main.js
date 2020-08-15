@@ -1,7 +1,15 @@
+// TODO: Read
+// - boids http://www.red3d.com/cwr/boids/
+//   - technical paper: http://www.red3d.com/cwr/papers/1987/boids.html
+//   - informal paper: http://www.red3d.com/cwr/nobump/nobump.html
+// - steering: http://www.red3d.com/cwr/steer/
+
+// TODO: Remove this eslint switch
 // eslint-disable-next-line max-classes-per-file
 class Actor {
-  constructor(context, x, y) {
+  constructor({ canvas, context }, x, y) {
     this.context = context
+    this.canvas = canvas
     this.x = x
     this.y = y
     this.velx = 10
@@ -9,10 +17,15 @@ class Actor {
   }
 
   update() {
-    // TODO: Do not hardcode 256 as canvas width/height
-    if ((this.x <= 0 && this.velx < 0) || (this.x >= 256 && this.velx > 0))
+    if (
+      (this.x <= 0 && this.velx < 0) ||
+      (this.x >= this.canvas.width && this.velx > 0)
+    )
       this.velx *= -1
-    if ((this.y <= 0 && this.vely < 0) || (this.y >= 256 && this.vely > 0))
+    if (
+      (this.y <= 0 && this.vely < 0) ||
+      (this.y >= this.canvas.width && this.vely > 0)
+    )
       this.vely *= -1
     this.x += this.velx
     this.y += this.vely
@@ -35,11 +48,7 @@ class Game {
     this.context = this.canvas.getContext("2d")
     // Initialize actors
     for (let i = 0; i < 8; i++) {
-      const actor = new Actor(
-        this.context,
-        Math.floor(Math.random() * 256),
-        1 + i * 32
-      )
+      const actor = new Actor(this, Math.floor(Math.random() * 256), 1 + i * 32)
       this.actors.push(actor)
     }
   }
