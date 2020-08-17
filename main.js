@@ -17,11 +17,21 @@ const V = class Vector {
     return new V(v.x + w.x, v.y + w.y)
   }
 
+  add(w) {
+    const { x, y } = V.add(this, w)
+    ;[this.x, this.y] = [x, y]
+  }
+
   static rot(v, a, degrees = true) {
     // Rotates vector v in degrees (or radians if degrees = false)
     const radians = degrees ? a * (Math.PI / 180) : a
     const [sina, cosa] = [Math.sin(radians), Math.cos(radians)]
     return new V(cosa * v.x - sina * v.y, sina * v.x + cosa * v.y)
+  }
+
+  rot(a) {
+    const { x, y } = V.rot(this, a)
+    ;[this.x, this.y] = [x, y]
   }
 
   static get zero() {
@@ -34,6 +44,7 @@ const V = class Vector {
 }
 const P = (x, y) => new V(x, y) // Short Vector (Point) construction
 
+// TODO: Remove this eslint switch
 // eslint-disable-next-line max-classes-per-file
 class Actor {
   constructor({ canvas, context }, x, y) {
@@ -49,8 +60,7 @@ class Actor {
     const { width } = this.canvas
     if ((x <= 0 && vx < 0) || (x >= width && vx > 0)) this.velocity.x = -vx
     if ((y <= 0 && vy < 0) || (y >= width && vy > 0)) this.velocity.y = -vy
-    this.location.x += this.velocity.x
-    this.location.y += this.velocity.y
+    this.location.add(this.velocity)
   }
 
   render() {
