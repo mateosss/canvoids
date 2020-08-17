@@ -12,8 +12,8 @@ class Actor {
     this.canvas = canvas
     this.x = x
     this.y = y
-    this.velx = 10
-    this.vely = 2
+    this.velx = 1
+    this.vely = 1
   }
 
   update() {
@@ -41,10 +41,24 @@ class Actor {
   }
 }
 
+class AttractionPoint extends Actor {
+  render() {
+    const c = this.context
+    c.save()
+    c.beginPath()
+    c.translate(this.x, this.y)
+    c.fillStyle = "deeppink"
+    c.arc(0, 0, 4, 0, Math.PI * 2)
+    c.fill()
+    c.restore()
+  }
+}
+
 class Game {
   constructor() {
     this.actors = []
     this.canvas = document.querySelector("#canvas")
+    this.attractionPoint = null
     this.context = this.canvas.getContext("2d")
     // Initialize actors
     for (let i = 0; i < 8; i++) {
@@ -53,9 +67,15 @@ class Game {
     }
   }
 
+  mouseDown(e) {
+    const [x, y] = [e.offsetX, e.offsetY]
+    this.attractionPoint = new AttractionPoint(this, x, y)
+  }
+
   run() {
     // TODO: Use requestAnimationFrame instead of setInterval
     setInterval(() => this.update(), 1000 / 60)
+    this.canvas.addEventListener("mousedown", (e) => this.mouseDown(e))
   }
 
   update() {
@@ -64,6 +84,7 @@ class Game {
     c.fillStyle = "black"
     c.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
+    this.attractionPoint?.render()
     for (const actor of this.actors) {
       actor.update()
       actor.render()
