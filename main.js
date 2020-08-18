@@ -4,6 +4,10 @@
 //   - informal paper: http://www.red3d.com/cwr/nobump/nobump.html
 // - steering: http://www.red3d.com/cwr/steer/
 
+// TODO: Implement Rule 2
+// TODO: Show facing direction
+// TODO: Implement Rule 3
+
 // TODO: Remove this eslint switch
 // eslint-disable-next-line max-classes-per-file
 const V = class Vector {
@@ -79,14 +83,14 @@ class Boid {
     this.canvas = canvas
     this.boids = boids
     this.location = P(x, y)
-    this.velocity = P(1, 1)
+    this.velocity = P(0.1, 0.1)
   }
 
   update() {
     // Go towards center of mass
     const { boids } = this
     const locationMean = P(0, 0)
-    for (const boid of boids) if (boid !== this) locationMean.add(boid.location)
+    for (const boid of boids) locationMean.add(boid.location)
     locationMean.scale(1 / boids.length)
     const scaledLocMean = V.scale(V.sub(locationMean, this.location), 0.01)
     this.velocity.add(scaledLocMean)
