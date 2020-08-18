@@ -166,8 +166,8 @@ class Game {
   constructor() {
     this.boids = []
     this.canvas = document.querySelector("#canvas")
-    this.attractionPoint = null
     this.context = this.canvas.getContext("2d")
+    this.attractionPointIndex = null
     // Initialize actors
     const ACTOR_COUNT = 64
     const { width } = this.canvas
@@ -178,9 +178,19 @@ class Game {
     }
   }
 
+  get attractionPoint() {
+    return this.attractionPointIndex in this.boids
+      ? this.boids[this.attractionPointIndex]
+      : null
+  }
+
   mouseDown(e) {
+    // Map viewport to canvas coordinates
     const [x, y] = [e.offsetX, e.offsetY]
-    this.attractionPoint = new AttractionPoint(this, x, y)
+    const vw = this.canvas.getBoundingClientRect().width
+    const cw = this.canvas.width
+    const ap = new AttractionPoint(this, (x / vw) * cw, (y / vw) * cw)
+    this.attractionPointIndex = this.boids.push(ap)
   }
 
   run() {
@@ -195,7 +205,6 @@ class Game {
     c.fillStyle = "black"
     c.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
-    this.attractionPoint?.render()
     for (const actor of this.boids) {
       actor.update()
       actor.render()
