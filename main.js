@@ -46,7 +46,7 @@ const V = class Vector {
   }
 
   static mul(v, k) {
-    V.scale(v, k)
+    return V.scale(v, k)
   }
 
   mul(k) {
@@ -65,6 +65,18 @@ const V = class Vector {
     ;[this.x, this.y] = [x, y]
   }
 
+  copy() {
+    return new V(this.x, this.y)
+  }
+
+  get magnitude() {
+    return Math.sqrt(this.x ** 2 + this.y ** 2)
+  }
+
+  get normalized() {
+    return V.scale(this.copy(), 1 / this.magnitude)
+  }
+
   static get zero() {
     return new V(0, 0)
   }
@@ -78,22 +90,39 @@ const P = (x, y) => new V(x, y) // Short Vector (Point) construction
 // TODO: Remove this eslint switch
 // eslint-disable-next-line max-classes-per-file
 class Boid {
-  constructor({ canvas, context, boids }, x, y) {
+  constructor({ canvas, context, boids }, x, y, radius = 10) {
     this.context = context
     this.canvas = canvas
     this.boids = boids
     this.location = P(x, y)
     this.velocity = P(0.1, 0.1)
+    this.radius = radius
   }
 
   update() {
     // Go towards center of mass
+    const LOCATION_MEAN_RATIO = 0.01
     const { boids } = this
     const locationMean = P(0, 0)
     for (const boid of boids) locationMean.add(boid.location)
     locationMean.scale(1 / boids.length)
-    const scaledLocMean = V.scale(V.sub(locationMean, this.location), 0.01)
+    const scaledLocMean = V.scale(
+      V.sub(locationMean, this.location),
+      LOCATION_MEAN_RATIO
+    )
     this.velocity.add(scaledLocMean)
+
+    // Repel other boids
+    const repulsion = P(0, 0)
+    for (const boid of boids) {
+      const stretch = V.sub(boid.location, this.location)
+      if (boid !== this && stretch.magnitude < this.radius) {
+        repulsion.add(V.mul(stretch, 0.5))
+      }
+    }
+    const REPULSION_RATIO = 1
+    repulsion.scale(-REPULSION_RATIO)
+    this.velocity.add(repulsion)
 
     // DVD Bounce
     const { x, y } = this.location
@@ -101,6 +130,11 @@ class Boid {
     const { width } = this.canvas
     if ((x <= 0 && vx < 0) || (x >= width && vx > 0)) this.velocity.x = -vx
     if ((y <= 0 && vy < 0) || (y >= width && vy > 0)) this.velocity.y = -vy
+
+    // Limit velocity
+    const maxVelocity = 5
+    if (this.velocity.magnitude > maxVelocity)
+      this.velocity = V.mul(this.velocity.normalized, maxVelocity)
 
     this.location.add(this.velocity)
   }
@@ -110,7 +144,7 @@ class Boid {
     c.save()
     c.translate(this.location.x, this.location.y)
     c.fillStyle = "white"
-    c.fillRect(0, 0, 4, 4)
+    c.fillRect(0, 0, this.radius, this.radius)
     c.restore()
   }
 }
@@ -135,8 +169,11 @@ class Game {
     this.attractionPoint = null
     this.context = this.canvas.getContext("2d")
     // Initialize actors
-    for (let i = 0; i < 8; i++) {
-      const actor = new Boid(this, Math.floor(Math.random() * 256), 1 + i * 32)
+    const ACTOR_COUNT = 64
+    const { width } = this.canvas
+    const chunk = width / ACTOR_COUNT
+    for (let i = 0; i < ACTOR_COUNT; i++) {
+      const actor = new Boid(this, Math.floor(Math.random() * width), chunk * i)
       this.boids.push(actor)
     }
   }
