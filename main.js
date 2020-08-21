@@ -167,7 +167,7 @@ class Boid {
     if ((y <= 0 && vy < 0) || (y >= width && vy > 0)) this.velocity.y = -vy
 
     // Limit velocity
-    const MAX_VELOCITY = 16
+    const MAX_VELOCITY = 8
     if (this.velocity.magnitude > MAX_VELOCITY)
       this.velocity = V.mul(this.velocity.normalized, MAX_VELOCITY)
 
@@ -196,7 +196,7 @@ class AttractionPoint extends Boid {
     c.save()
     c.beginPath()
     c.translate(this.location.x, this.location.y)
-    c.fillStyle = "deeppink"
+    c.fillStyle = "#E91E63"
     c.arc(0, 0, 4, 0, Math.PI * 2)
     c.fill()
     c.restore()
@@ -225,27 +225,41 @@ class Game {
       : null
   }
 
+  disperse() {
+    for (const boid of this.boids) {
+      boid.location.add(V.mul(boid.velocity, -50))
+    }
+  }
+
   mouseDown(e) {
     // Map viewport to canvas coordinates
-    const [x, y] = [e.offsetX, e.offsetY]
-    const vw = this.canvas.getBoundingClientRect().width
-    const cw = this.canvas.width
-    const ap = new AttractionPoint(this, (x / vw) * cw, (y / vw) * cw)
-    this.attractionPointIndex = this.boids.push(ap)
+    if (e.button !== 0) {
+      this.disperse()
+    } else {
+      const [x, y] = [e.offsetX, e.offsetY]
+      const vw = this.canvas.getBoundingClientRect().width
+      const cw = this.canvas.width
+      const ap = new AttractionPoint(this, (x / vw) * cw, (y / vw) * cw)
+      this.attractionPointIndex = this.boids.push(ap)
+    }
+  }
+
+  fillScreen(color) {
+    const c = this.context
+    c.fillStyle = color
+    c.fillRect(0, 0, this.canvas.width, this.canvas.height)
   }
 
   run() {
     // TODO: Use requestAnimationFrame instead of setInterval
     setInterval(() => this.update(), 1000 / 60)
     this.canvas.addEventListener("mousedown", (e) => this.mouseDown(e))
+    this.fillScreen("white")
   }
 
   update() {
     // Clean canvas
-    const c = this.context
-    c.fillStyle = "black"
-    c.fillRect(0, 0, this.canvas.width, this.canvas.height)
-
+    this.fillScreen("rgba(0, 0, 0, 0.005)")
     for (const actor of this.boids) {
       actor.update()
       actor.render()

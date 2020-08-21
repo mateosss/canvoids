@@ -1,26 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#263238" />
+    <title>Canvoids</title>
+  </head>
+  <style>
+    body {
+      background-color: #263238;
+    }
+    canvas {
+      border-radius: 16px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90vmin;
+      height: 90vmin;
+    }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Canvoids</title>
-</head>
-<style>
-  canvas {
-    border: 2px solid green;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90vmin;
-    height: 90vmin;
-  }
-</style>
+    #disperse {
+      position: fixed;
+      left: calc(50% + 45vmin - 6rem);
+      width: 6rem;
+      height: 2rem;
+      font-size: 0.5rem;
+      bottom: calc(50% - 45vmin);
+      transform: translate(-4px, -4px);
+      text-transform: uppercase;
+      border: none;
+      background-color: transparent;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      user-select: none;
+      border-radius: 16px 4px;
+      color: white;
+      letter-spacing: 4px;
+    }
+    #disperse:focus {
+      outline: 0;
+      background-color: black;
+      color: white;
+    }
+    #disperse:active {
+      transition: none;
+      color: #e91e63;
+    }
+  </style>
 
-<body>
-  <canvas id="canvas" width="1024" height="1024"></canvas>
-</body>
-<script src="main.js"></script>
-
+  <body>
+    <canvas id="canvas" width="1024" height="1024"></canvas>
+    <button id="disperse" onclick="game.disperse()">Disperse</button>
+  </body>
+  <script src="main.js"></script>
 </html>
