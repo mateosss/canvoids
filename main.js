@@ -147,6 +147,18 @@ class Boid {
     repulsion.scale(-REPULSION_RATIO)
     this.velocity.add(repulsion)
 
+    // Align with others
+    const alignment = P(0, 0)
+    for (const boid of boids) {
+      if (boid !== this) {
+        alignment.add(boid.velocity)
+      }
+    }
+    alignment.scale(1 / (boids.length - 1))
+    alignment.sub(this.velocity) // Make relative to current velocity
+    alignment.scale(1 / 8) // Use a ratio of it
+    this.velocity.add(alignment)
+
     // DVD Bounce
     const { x, y } = this.location
     const { x: vx, y: vy } = this.velocity
@@ -155,9 +167,9 @@ class Boid {
     if ((y <= 0 && vy < 0) || (y >= width && vy > 0)) this.velocity.y = -vy
 
     // Limit velocity
-    const maxVelocity = 5
-    if (this.velocity.magnitude > maxVelocity)
-      this.velocity = V.mul(this.velocity.normalized, maxVelocity)
+    const MAX_VELOCITY = 16
+    if (this.velocity.magnitude > MAX_VELOCITY)
+      this.velocity = V.mul(this.velocity.normalized, MAX_VELOCITY)
 
     this.location.add(this.velocity)
   }
