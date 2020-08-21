@@ -231,17 +231,24 @@ class Game {
     }
   }
 
+  addAttractionPoint(x, y) {
+    const vw = this.canvas.getBoundingClientRect().width
+    const cw = this.canvas.width
+    const ap = new AttractionPoint(this, (x / vw) * cw, (y / vw) * cw)
+    this.attractionPointIndex = this.boids.push(ap)
+  }
+
   mouseDown(e) {
     // Map viewport to canvas coordinates
     if (e.button !== 0) {
       this.disperse()
     } else {
-      const [x, y] = [e.offsetX, e.offsetY]
-      const vw = this.canvas.getBoundingClientRect().width
-      const cw = this.canvas.width
-      const ap = new AttractionPoint(this, (x / vw) * cw, (y / vw) * cw)
-      this.attractionPointIndex = this.boids.push(ap)
+      this.addAttractionPoint(e.offsetX, e.offsetY)
     }
+  }
+
+  mouseWheel(e) {
+    this.addAttractionPoint(e.offsetX, e.offsetY)
   }
 
   fillScreen(color) {
@@ -254,6 +261,7 @@ class Game {
     // TODO: Use requestAnimationFrame instead of setInterval
     setInterval(() => this.update(), 1000 / 60)
     this.canvas.addEventListener("mousedown", (e) => this.mouseDown(e))
+    this.canvas.addEventListener("wheel", (e) => this.mouseWheel(e))
     this.fillScreen("white")
   }
 
