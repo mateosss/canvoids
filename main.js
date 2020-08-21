@@ -36,6 +36,15 @@ const V = class Vector {
     ;[this.x, this.y] = [x, y]
   }
 
+  static dot(v, w) {
+    return v.x * w.x + v.y * w.y
+  }
+
+  dot(w) {
+    const { x, y } = V.dot(this, w)
+    ;[this.x, this.y] = [x, y]
+  }
+
   static scale(v, k) {
     return new V(v.x * k, v.y * k)
   }
@@ -65,6 +74,20 @@ const V = class Vector {
     ;[this.x, this.y] = [x, y]
   }
 
+  static angleBetween(from, to) {
+    const dot = V.dot(from, to)
+    const det = from.x * to.y + from.y + to.x
+    return Math.atan2(det, dot)
+  }
+
+  angleTo(to) {
+    return V.angleBetween(this, to)
+  }
+
+  get angle() {
+    return this.angleTo(new V(1, 0))
+  }
+
   copy() {
     return new V(this.x, this.y)
   }
@@ -90,12 +113,12 @@ const P = (x, y) => new V(x, y) // Short Vector (Point) construction
 // TODO: Remove this eslint switch
 // eslint-disable-next-line max-classes-per-file
 class Boid {
-  constructor({ canvas, context, boids }, x, y, radius = 10) {
+  constructor({ canvas, context, boids }, x, y, radius = 16) {
     this.context = context
     this.canvas = canvas
     this.boids = boids
     this.location = P(x, y)
-    this.velocity = P(0.1, 0.1)
+    this.velocity = P(1, 0)
     this.radius = radius
   }
 
@@ -117,7 +140,7 @@ class Boid {
     for (const boid of boids) {
       const stretch = V.sub(boid.location, this.location)
       if (boid !== this && stretch.magnitude < this.radius) {
-        repulsion.add(V.mul(stretch, 0.5))
+        repulsion.add(stretch)
       }
     }
     const REPULSION_RATIO = 1
@@ -144,7 +167,13 @@ class Boid {
     c.save()
     c.translate(this.location.x, this.location.y)
     c.fillStyle = "white"
-    c.fillRect(0, 0, this.radius, this.radius)
+    c.beginPath()
+    c.rotate(this.velocity.angle)
+    c.moveTo(0, this.radius / 3)
+    c.lineTo(this.radius, 0)
+    c.lineTo(0, -this.radius / 3)
+    c.closePath()
+    c.fill()
     c.restore()
   }
 }
