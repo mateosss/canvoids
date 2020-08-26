@@ -6,7 +6,6 @@ https://docs.unity3d.com/ScriptReference/Vector2.html
 Usage:
 const v = new Vector(1, 0)
 const w = new Vector(1, 3)
-const k = 3.14
 const sum = V.add(v, w) // -> (2, 3), v and w are intact
 // Or maybe you just want to reuse v, then
 v.add(w) // This modifies v, so now v.x === 2 and v.y === 3
