@@ -55,4 +55,9 @@
     <button id="disperse" onclick="game.disperse()">Disperse</button>
   </body>
   <script type="module" src="src/main.js"></script>
+  <script type="module">
+    import Game from "./src/main.js"
+    const game = new Game()
+    game.run()
+  </script>
 </html>
