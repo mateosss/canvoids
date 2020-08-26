@@ -16,6 +16,7 @@ const MAX_VELOCITY = 8
 const CENTER_OF_MASS_RULE_ATTRACTION = 0.01
 const REPULSION_RADIUS = 1
 const REPULSION_MULTIPLIER = 1
+const ALIGNMENT_RULE_MULTIPLIER = 1 / 16
 const DISPERSE_AMOUNT = 50
 
 const P = (x, y) => new V(x, y) // Short Vector (Point) constructor
@@ -65,7 +66,7 @@ export default class Boid {
     }
     alignment.scale(1 / (this.boids.length - 1))
     alignment.sub(this.velocity) // Make relative to current velocity
-    alignment.scale(1 / 8) // Use a ratio of it
+    alignment.scale(ALIGNMENT_RULE_MULTIPLIER) // Use a fraction of it
     return alignment
   }
 
