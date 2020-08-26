@@ -53,7 +53,9 @@
     "rules": {
       "prettier/prettier": "error",
       "no-restricted-syntax": "off",
-      "no-plusplus": "off"
+      "no-plusplus": "off",
+      "import/extensions": ["error", "always"],
+      "max-classes-per-file": "off"
     }
   }
 }
