@@ -11,10 +11,14 @@
 
 import V from "./Vector.js"
 
+const MAX_VELOCITY = 8
+const CENTER_OF_MASS_RULE_ATTRACTION = 0.01
+const REPULSION_RADIUS = 1
+const REPULSION_MULTIPLIER = 1
+
 const P = (x, y) => new V(x, y) // Short Vector (Point) constructor
 
 class Boid {
-  static publisher = "Ilya Kantor";
   constructor({ canvas, context, boids }, x, y, radius = 16) {
     this.context = context
     this.canvas = canvas
@@ -25,36 +29,32 @@ class Boid {
   }
 
   get velocityForCenterOfMass() {
-    // TODO: Find better name
-    // TODO: Better method brief
-    // Go towards center of mass
-    const LOCATION_MEAN_RATIO = 0.01
+    // Returns a velocity delta to add to go towards center of mass
     const locationMean = P(0, 0)
     for (const boid of this.boids) locationMean.add(boid.location)
     locationMean.scale(1 / this.boids.length)
-    const scaledLocMean = V.scale(
-      V.sub(locationMean, this.location),
-      LOCATION_MEAN_RATIO
+    const scaledStretch = V.scale(
+      V.sub(locationMean, this.location), // Stretch from this boid to location Mean
+      CENTER_OF_MASS_RULE_ATTRACTION
     )
-    return scaledLocMean
+    return scaledStretch
   }
 
   get velocityForRepulsion() {
-    // Repel other boids
+    // Returns a velocity delta to add to avoid other boids
     const repulsion = P(0, 0)
     for (const boid of this.boids) {
       const stretch = V.sub(boid.location, this.location)
-      if (boid !== this && stretch.magnitude < this.radius) {
+      if (boid !== this && stretch.magnitude < this.radius * REPULSION_RADIUS) {
         repulsion.add(stretch)
       }
     }
-    const REPULSION_RATIO = 1
-    repulsion.scale(-REPULSION_RATIO)
+    repulsion.scale(-REPULSION_MULTIPLIER)
     return repulsion
   }
 
   get velocityForAlignment() {
-    // Align with others
+    // Returns a velocity delta to add to align velocity to the other boids
     const alignment = P(0, 0)
     for (const boid of this.boids) {
       if (boid !== this) {
@@ -82,12 +82,12 @@ class Boid {
     this.velocity.add(this.velocityForRepulsion)
     this.velocity.add(this.velocityForAlignment)
     this.invertVelocityOnBorders()
-    const MAX_VELOCITY = 8
     this.velocity.clamp(MAX_VELOCITY)
     this.location.add(this.velocity)
   }
 
   render() {
+    // Render a white triangle that aligns to the boid velocity
     const c = this.context
     c.save()
     c.translate(this.location.x, this.location.y)
@@ -105,6 +105,7 @@ class Boid {
 
 class PinkBoid extends Boid {
   render() {
+    // Render a pink dot
     const c = this.context
     c.save()
     c.beginPath()
@@ -116,52 +117,43 @@ class PinkBoid extends Boid {
   }
 }
 
+const BOID_COUNT = 64
 export default class Game {
   constructor() {
     this.boids = []
     this.canvas = document.querySelector("#canvas")
     this.context = this.canvas.getContext("2d")
-    this.attractionPointIndex = null
-    // Initialize actors
-    const ACTOR_COUNT = 64
-    const { width } = this.canvas
-    const chunk = width / ACTOR_COUNT
-    for (let i = 0; i < ACTOR_COUNT; i++) {
-      const actor = new Boid(this, Math.floor(Math.random() * width), chunk * i)
-      this.boids.push(actor)
-    }
-  }
 
-  get attractionPoint() {
-    return this.attractionPointIndex in this.boids
-      ? this.boids[this.attractionPointIndex]
-      : null
+    // Initialize boids
+    const { width } = this.canvas
+    const chunk = width / BOID_COUNT
+    for (let i = 0; i < BOID_COUNT; i++) {
+      const boid = new Boid(this, Math.floor(Math.random() * width), chunk * i)
+      this.boids.push(boid)
+    }
   }
 
   disperse() {
-    for (const boid of this.boids) {
-      boid.location.add(V.mul(boid.velocity, -50))
-    }
+    // Move far appart each boid
+    for (const boid of this.boids) boid.location.add(V.mul(boid.velocity, -50))
   }
 
-  addAttractionPoint(x, y) {
+  addPinkBoid(x, y) {
     const vw = this.canvas.getBoundingClientRect().width
     const cw = this.canvas.width
-    const ap = new PinkBoid(this, (x / vw) * cw, (y / vw) * cw)
-    this.attractionPointIndex = this.boids.push(ap)
+    const boid = new PinkBoid(this, (x / vw) * cw, (y / vw) * cw)
+    this.boids.push(boid)
   }
 
   mouseDown(e) {
-    // Map viewport to canvas coordinates
-    if (e.button !== 0) {
-      this.disperse()
-    } else {
-      this.addAttractionPoint(e.offsetX, e.offsetY)
-    }
+    // Add a pink boid on left mouse click, or disperse on any other click
+    if (e.button === 0) this.addPinkBoid(e.offsetX, e.offsetY)
+    else this.disperse()
   }
 
   mouseWheel(e) {
-    this.addAttractionPoint(e.offsetX, e.offsetY)
+    // Add pink boids on mouse scroll, useful for making tons of pink boids
+    this.addPinkBoid(e.offsetX, e.offsetY)
   }
 
   fillScreen(color) {
@@ -171,6 +163,7 @@ export default class Game {
   }
 
   run() {
+    // Starts the simulation, register events and schedule update method
     // TODO: Use requestAnimationFrame instead of setInterval
     setInterval(() => this.update(), 1000 / 60)
     this.canvas.addEventListener("mousedown", (e) => this.mouseDown(e))
@@ -179,8 +172,7 @@ export default class Game {
   }
 
   update() {
-    // Clean canvas
-    this.fillScreen("rgba(0, 0, 0, 0.005)")
+    this.fillScreen("rgba(0, 0, 0, 0.005)") // Low alpha for trails/dreamy effect
     for (const actor of this.boids) {
       actor.update()
       actor.render()

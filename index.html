@@ -52,12 +52,18 @@
 
   <body>
     <canvas id="canvas" width="1024" height="1024"></canvas>
-    <button id="disperse" onclick="game.disperse()">Disperse</button>
+    <button id="disperse">Disperse</button>
   </body>
   <script type="module" src="src/main.js"></script>
   <script type="module">
     import Game from "./src/main.js"
+
+    // Run game
     const game = new Game()
     game.run()
+
+    // Add disperse button event
+    const disperseButton = document.querySelector("#disperse")
+    disperseButton.addEventListener("click", () => game.disperse())
   </script>
 </html>
