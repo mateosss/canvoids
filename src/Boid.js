@@ -80,9 +80,21 @@ export default class Boid {
     if ((y <= 0 && vy < 0) || (y >= width && vy > 0)) this.velocity.y = -vy
   }
 
+  setLocation(x, y) {
+    this.location = P(x, y)
+  }
+
+  pointVelocityTo(x, y) {
+    this.velocity = V.scale(
+      V.sub(P(x, y), this.location).normalized,
+      this.velocity.magnitude
+    )
+  }
+
   disperse() {
     // Place this boid "back" with respect to its direction and velocity
-    this.location.add(V.mul(this.velocity, -DISPERSE_AMOUNT))
+    this.location.add(V.mul(this.velocity.normalized, -DISPERSE_AMOUNT * 4))
+    this.location = P(canvas.width / 2, canvas.height / 2)
   }
 
   update() {
@@ -111,14 +123,31 @@ export default class Boid {
   }
 }
 
+function* _nextColor() {
+  const colors = ["#E91E63", "#2196F3", "#4CAF50", "#FFC107"]
+  for (let i = 0; ; i = (i + 1) % colors.length) yield colors[i]
+}
+const nextColor = _nextColor()
+
 export class PinkBoid extends Boid {
+  constructor() {
+    super(...arguments)
+    this.color = nextColor.next().value
+    console.log(this.color)
+  }
+
+  update() {
+    super.update()
+    this.velocity.scale(16)
+  }
+
   render() {
     // Render a pink dot
     const c = this.context
     c.save()
     c.beginPath()
     c.translate(this.location.x, this.location.y)
-    c.fillStyle = "#E91E63"
+    c.fillStyle = this.color
     c.arc(0, 0, 4, 0, Math.PI * 2)
     c.fill()
     c.restore()

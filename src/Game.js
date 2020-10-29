@@ -27,22 +27,37 @@ export default class Game {
     for (const boid of this.boids) boid.disperse()
   }
 
-  addPinkBoid(x, y) {
+  concentrate(x, y) {
+    for (const boid of this.boids) boid.setLocation(x, y)
+  }
+
+  goTowards(x, y) {
+    for (const boid of this.boids) boid.pointVelocityTo(x, y)
+  }
+
+  eventOffsetToCanvas(x, y) {
     const vw = this.canvas.getBoundingClientRect().width
     const cw = this.canvas.width
-    const boid = new PinkBoid(this, (x / vw) * cw, (y / vw) * cw)
+    return [(x / vw) * cw, (y / vw) * cw]
+  }
+
+  addPinkBoid(x, y) {
+    const boid = new PinkBoid(this, x, y)
     this.boids.push(boid)
   }
 
   mouseDown(e) {
     // Add a pink boid on left mouse click, or disperse on any other click
-    if (e.button === 0) this.addPinkBoid(e.offsetX, e.offsetY)
-    else this.disperse()
+    const [x, y] = this.eventOffsetToCanvas(e.offsetX, e.offsetY)
+    if (e.button === 0) this.concentrate(x, y)
+    else if (e.button === 1) this.goTowards(x, y)
+    else this.addPinkBoid(x, y)
   }
 
   mouseWheel(e) {
     // Add pink boids on mouse scroll, useful for making tons of pink boids
-    this.addPinkBoid(e.offsetX, e.offsetY)
+    const [x, y] = this.eventOffsetToCanvas(e.offsetX, e.offsetY)
+    this.addPinkBoid(x, y)
   }
 
   fillScreen(color) {
