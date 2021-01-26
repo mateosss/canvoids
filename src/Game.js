@@ -49,9 +49,20 @@ export default class Game {
   mouseDown(e) {
     // Add a pink boid on left mouse click, or disperse on any other click
     const [x, y] = this.eventOffsetToCanvas(e.offsetX, e.offsetY)
-    if (e.button === 0) this.concentrate(x, y)
-    else if (e.button === 1) this.goTowards(x, y)
-    else this.addPinkBoid(x, y)
+    if (e.button === 0) this.goTowards(x, y)
+    else if (e.button === 1) this.concentrate(x, y)
+    this.pressing = true
+  }
+
+  mouseMove(e) {
+    if (this.pressing) {
+      const [x, y] = this.eventOffsetToCanvas(e.offsetX, e.offsetY)
+      this.goTowards(x, y)
+    }
+  }
+
+  mouseUp(e) {
+    this.pressing = false
   }
 
   mouseWheel(e) {
@@ -71,6 +82,8 @@ export default class Game {
     // TODO: Use requestAnimationFrame instead of setInterval
     setInterval(() => this.update(), 1000 / 60)
     this.canvas.addEventListener("mousedown", (e) => this.mouseDown(e))
+    this.canvas.addEventListener("mousemove", e => this.mouseMove(e))
+    this.canvas.addEventListener("mouseup", (e) => this.mouseUp(e))
     this.canvas.addEventListener("wheel", (e) => this.mouseWheel(e))
     this.fillScreen("white")
   }
